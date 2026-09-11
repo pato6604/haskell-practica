@@ -63,3 +63,61 @@ cantPrimosDividen d h | h == 1 = 0
 
 cantDivisoresPrimos :: Integer -> Integer 
 cantDivisoresPrimos n = cantPrimosDividen n n 
+
+
+
+
+
+masPrimosQueLoDividen :: Integer -> Integer -> Integer
+masPrimosQueLoDividen d h | d == h = d
+                          | cantDivisoresPrimos d >= cantDivisoresPrimos res = d
+                          | otherwise = res
+                          where res = cantDivisoresPrimos (d+1) 
+
+
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+divisoresPropiosAux :: Integer -> Integer -> [Integer]
+divisoresPropiosAux d h | d == h = []
+                        | h `mod` d == 0 = d : divisoresPropiosAux (d+1) h
+                        | otherwise = divisoresPropiosAux (d+1) h 
+
+
+
+divisoresPropios :: Integer -> [Integer]
+divisoresPropios n = divisoresPropiosAux 1 n 
+
+
+
+
+suma :: [Integer] -> Integer
+suma [] = 0
+suma (x:xs) = x + suma xs 
+
+
+
+masAbundante :: Integer -> Integer -> Integer
+masAbundante d h | d == h = d   
+                 | suma(divisoresPropios d) >= mejorR = d 
+                 | otherwise = mejorR
+                 where mejorR = masAbundante (d+1) h
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+extraerMultiplosAux :: Integer -> Integer -> [Integer]
+extraerMultiplosAux d h | d == h = [d]
+                        | h `mod` d == 0 = d : extraerMultiplosAux (d+1) h 
+                        | otherwise = extraerMultiplosAux (d+1) h
+
+
+
+
+extraerMultiplos :: Integer -> [Integer]
+extraerMultiplos n = extraerMultiplosAux 1 n 
