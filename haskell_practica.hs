@@ -54,13 +54,14 @@ esPrimo :: Integer -> Bool
 esPrimo n = esPrimoAux n 2 n 
 
 
+---AUXILIAR----
 cantPrimosDividen :: Integer -> Integer -> Integer 
 cantPrimosDividen d h | h == 1 = 0 
                       | (d `mod` h == 0) && (esPrimo h) = 1 + cantPrimosDividen d (h-1)
                       | otherwise = cantPrimosDividen d (h-1)
 
 
-
+---PRINCIPAL---
 cantDivisoresPrimos :: Integer -> Integer 
 cantDivisoresPrimos n = cantPrimosDividen n n 
 
@@ -110,14 +111,64 @@ masAbundante d h | d == h = d
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-
-extraerMultiplosAux :: Integer -> Integer -> [Integer]
-extraerMultiplosAux d h | d == h = [d]
-                        | h `mod` d == 0 = d : extraerMultiplosAux (d+1) h 
-                        | otherwise = extraerMultiplosAux (d+1) h
-
+cantMultiplosEnRango :: Integer -> Integer -> Integer -> Integer
+cantMultiplosEnRango x d h | d > h = 0
+                           | d `mod` x == 0 = 1 + cantMultiplosEnRango x (d+1) h
+                           | otherwise = cantMultiplosEnRango x (d+1) h 
 
 
 
-extraerMultiplos :: Integer -> [Integer]
-extraerMultiplos n = extraerMultiplosAux 1 n 
+masMultiplos :: Integer -> Integer -> Integer
+masMultiplos d h | d == h = d 
+                 | cantMultiplosEnRango d d h <= cantMultiplosEnRango mejorDelResto d h = mejorDelResto
+                 | otherwise = d
+                 where mejorDelResto = masMultiplos (d+1) h 
+
+
+    
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+sumarDigitos :: Integer -> Integer 
+sumarDigitos n | n < 10 = n
+               | otherwise = (n `mod` 10) + sumarDigitos (n `div` 10) 
+
+
+masSumaDigitos :: Integer -> Integer -> Integer
+masSumaDigitos d h | d == h = d 
+                   | sumarDigitos d >= sumarDigitos mejor = d 
+                   | otherwise = mejor 
+                   where mejor = masSumaDigitos (d+1) h 
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+esPar :: Integer -> Bool
+esPar n = n `mod` 2 == 0 
+
+
+divisoresParesDeNAux :: Integer -> Integer -> Integer -> [Integer]
+divisoresParesDeNAux n d h | d > h = []
+                           | (n `mod` d) == 0 && (esPar d) = d : divisoresParesDeNAux n (d+1) h 
+                           | otherwise = divisoresParesDeNAux n (d+1) h 
+
+
+
+
+divisoresPares :: Integer -> [Integer]
+divisoresPares n = divisoresParesDeNAux n 1 n 
+
+
+
+longitud :: [Integer] -> Integer 
+longitud [] = 0
+longitud (x:xs) = 1 + longitud xs 
+
+
+
+
+masDivisoresPares :: Integer -> Integer -> Integer 
+masDivisoresPares d h | d == h = longitud(divisoresPares d)
+                      | longitud(divisoresPares d) <= longitud(divisoresPares resto) = resto 
+                      | otherwise = d 
+                      where resto = masDivisoresPares (d+1) h  
