@@ -172,3 +172,78 @@ masDivisoresPares d h | d == h = longitud(divisoresPares d)
                       | longitud(divisoresPares d) <= longitud(divisoresPares resto) = resto 
                       | otherwise = d 
                       where resto = masDivisoresPares (d+1) h  
+
+
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+factoresPrimosAux :: Integer -> Integer -> [Integer]
+factoresPrimosAux n d | n == 1 = []
+                      | n `mod` d == 0 = d : factoresPrimosAux (n `div` d) d    
+                      | otherwise = factoresPrimosAux n (d+1)
+
+                
+factoresPrimos :: Integer -> [Integer]
+factoresPrimos n = factoresPrimosAux n 2 
+
+
+
+esAtractivo :: Integer -> Bool
+esAtractivo n | n == 1 = False
+              | esPrimo(longitud(factoresPrimos(n))) = True
+
+
+
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+sonAmigos :: Integer -> Integer -> Bool
+sonAmigos n m | (suma(divisoresPropios n) == m) && (suma(divisoresPropios m) == n) = True 
+              | otherwise = False
+
+    
+
+
+
+esPerfecto :: Integer -> Bool 
+esPerfecto n | suma(divisoresPropios n) == n = True 
+             | otherwise = False
+
+
+
+losPrimerosNPerfectosAux :: Integer -> Integer ->  [Integer]
+losPrimerosNPerfectosAux n d   | n == 0 = []
+                               | esPerfecto d = d : losPrimerosNPerfectosAux (n-1) (d+1)  
+                               | otherwise = losPrimerosNPerfectosAux n (d+1)  
+
+
+
+losPrimerosNPerfectos :: Integer -> [Integer]
+losPrimerosNPerfectos n = losPrimerosNPerfectosAux n 1 
+
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+nEsimoPrimoAux :: Integer -> Integer -> Integer 
+nEsimoPrimoAux n d | n == 0 = (d-1) 
+                   | esPrimo d = nEsimoPrimoAux (n-1) (d+1) 
+                   | otherwise = nEsimoPrimoAux n (d+1)
+
+
+
+nEsimoPrimo :: Integer -> Integer 
+nEsimoPrimo n = nEsimoPrimoAux n 2 
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
