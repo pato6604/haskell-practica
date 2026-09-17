@@ -243,7 +243,13 @@ nEsimoPrimo n = nEsimoPrimoAux n 2
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-
+esMontaniaRusa :: [Integer] -> Bool
+esMontaniaRusa [] = True
+esMontaniaRusa [x] = True
+esMontaniaRusa [x,y] = True
+esMontaniaRusa (x:y:z:xs) | (x < y) && (y > z) = esMontaniaRusa (y:z:xs)
+                          | (x > y) && (y < z) = esMontaniaRusa (y:z:xs)
+                          | otherwise = False 
 
 
 
