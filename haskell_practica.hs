@@ -1,3 +1,9 @@
+import GHC.Float (sinDouble)
+import Distribution.Simple.PackageIndex (InstalledPackageIndex)
+import Language.Haskell.TH (Strict)
+import Data.Complex (imagPart)
+import Graphics.Win32 (LARGE_INTEGER)
+
 contarMult3Hasta :: Integer -> Integer -> Integer
 contarMult3Hasta d h | h == 0 = 0
                      | (d `mod` h == 0) && (h `mod` 3 == 0) = 1 + contarMult3Hasta d (h-1)  
@@ -253,3 +259,170 @@ esMontaniaRusa (x:y:z:xs) | (x < y) && (y > z) = esMontaniaRusa (y:z:xs)
 
 
 
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+invertir :: [Integer] -> [Integer] -> [Integer]
+invertir [] _ = []
+invertir (x:xs) [] =  invertir xs [] ++ [x]
+
+
+
+
+ultimaAparicionDeUnParQueDivideAnAux :: [Integer] -> Integer -> Integer 
+ultimaAparicionDeUnParQueDivideAnAux [] _ = 0 
+ultimaAparicionDeUnParQueDivideAnAux (x:xs) n | (esPar x) && (n `mod` x == 0) = x 
+                                              | otherwise = ultimaAparicionDeUnParQueDivideAnAux xs n 
+
+
+
+ultimaAparicionDeUnParQueDivideAn :: [Integer] -> Integer -> Integer 
+ultimaAparicionDeUnParQueDivideAn [x] _ = x 
+ultimaAparicionDeUnParQueDivideAn (x:xs) n  = ultimaAparicionDeUnParQueDivideAnAux(invertir (x:xs) []) n 
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+listaSinonimos :: [(String,String)] -> String -> [String]
+listaSinonimos [] _ = []
+listaSinonimos ((palabra,sinonimo): xs) p | p == palabra = sinonimo : listaSinonimos xs p 
+                                          | otherwise  = listaSinonimos xs p 
+
+
+eliminarClave :: String -> [(String,String)] -> [(String,String)]
+eliminarClave _ [] = []
+eliminarClave palabra ((x,y):xs) | palabra == x = eliminarClave palabra xs 
+                                 | otherwise = (x,y) : eliminarClave palabra xs 
+
+
+sinonimos :: [(String, String)] -> [(String, [String])]
+sinonimos [] = []
+sinonimos ((x,y):xs) = (x, listaSinonimos ((x,y):xs) x) : sinonimos (eliminarClave x xs)
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+listaPorTemporada :: Integer -> [(String,Integer)] -> [String]
+listaPorTemporada _ [] = []
+listaPorTemporada temp ((serie,t):xs) | temp == t = serie : listaPorTemporada temp xs 
+                                      | otherwise = listaPorTemporada temp xs 
+
+
+
+
+quitarSeriesConMismasTemp :: Integer -> [(String, Integer)] -> [(String, Integer)]
+quitarSeriesConMismasTemp _ [] = []
+quitarSeriesConMismasTemp temp ((s,t):xs) | temp == t = quitarSeriesConMismasTemp temp xs 
+                                          | otherwise = (s,t) : quitarSeriesConMismasTemp temp xs 
+ 
+
+
+agruparPorCantidadDeTemporadas :: [(String, Integer)] -> [(Integer, [String])]
+agruparPorCantidadDeTemporadas [] = []
+agruparPorCantidadDeTemporadas ((s,t): xs) = (t, listaPorTemporada t ((s,t):xs)) : agruparPorCantidadDeTemporadas(quitarSeriesConMismasTemp t xs)
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+contarProducto :: [String] -> String -> Integer
+contarProducto [] _ = 0
+contarProducto (x:xs) p | x == p = 1 + contarProducto xs p 
+                        | otherwise = contarProducto xs p 
+
+
+quitarProducto :: [String] -> String -> [String]
+quitarProducto [] _ = []
+quitarProducto (x:xs) prod | x == prod = quitarProducto xs prod
+                           | otherwise = x : quitarProducto xs prod 
+
+
+generarStock :: [String] -> [(String,Integer)]
+generarStock [] = []
+generarStock (x:xs) = (x, contarProducto (x:xs) x) : generarStock (quitarProducto xs x)
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+sumaCuadradosPares :: Integer -> Integer
+sumaCuadradosPares n | n == 1 = 0
+                     | n `mod` 2 == 0 = n^2 + sumaCuadradosPares (n-1)
+                     | otherwise = sumaCuadradosPares (n-1)
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+sumaTodos :: [Integer] -> Integer
+sumaTodos [] = 0
+sumaTodos (x:xs) = x + sumaTodos xs 
+
+
+promedio :: [Integer] -> Float 
+promedio [] = 0.0
+promedio (x:xs) = fromInteger(sumaTodos (x:xs))/fromInteger(longitud (x:xs))
+
+
+mejorPromedio :: [(String,[Integer])] -> String
+mejorPromedio [(nombre,notas)] = nombre 
+mejorPromedio ((nombre1,notas1):(nombre2,notas2):xs) | promedio notas1 > promedio notas2 = mejorPromedio ((nombre1,notas1):xs) 
+                                                     | promedio notas1 < promedio notas2 =  mejorPromedio((nombre2,notas2):xs) 
+                                                     | otherwise = mejorPromedio ((nombre1,notas1):xs) 
+
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+materiasPorRangoH :: [(String,String,Integer,Integer)] -> Integer -> Integer -> [String]
+materiasPorRangoH [] _ _ = []
+materiasPorRangoH ((m,d,i,f):xs) inicio fin | i <= inicio && fin <= f = m : materiasPorRangoH xs inicio fin 
+                                            | otherwise = materiasPorRangoH xs inicio fin 
+
+
+
+quitarMateriasRepe :: [(String,String,Integer,Integer)] -> String -> [(String,String,Integer,Integer)]
+quitarMateriasRepe [] _ = []
+quitarMateriasRepe ((m,d,i,f): xs) materia | m == materia = quitarMateriasRepe xs materia
+                                           | otherwise = (m,d,i,f) : quitarMateriasRepe xs materia 
+
+
+
+
+
+materiasComisionN :: [(String,String,Integer,Integer)] -> Integer -> Integer -> [String]
+materiasComisionN [] _ _ = []
+materiasComisionN ((m,d,i,f):xs) inicio fin = materiasPorRangoH ((m,d,i,f):xs) inicio fin ++ materiasComisionN(quitarMateriasRepe((m,d,i,f):xs) m) inicio fin   
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+saturarEnUmbralHastaNegativo :: [Integer] -> Integer -> [Integer]
+saturarEnUmbralHastaNegativo [x] _ = [x]
+saturarEnUmbralHastaNegativo (x:y:xs) u | x * y < 0 = [u]
+                                        | x <= u = x : saturarEnUmbralHastaNegativo (y:xs) u 
+                                        | x > u = u : saturarEnUmbralHastaNegativo (y:xs) u 
+
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+esImpar :: Integer -> Bool
+esImpar n = n `mod` 2 /= 0 
+
+
+
+invertir2 :: [Integer] -> [Integer] -> [Integer] 
+invertir2 [] _ = []
+invertir2 (x:xs) [] = invertir2 xs [] ++ [x]
+
+
+imparConMayorPosicionQueDivideANAux :: [Integer] -> Integer -> Integer 
+imparConMayorPosicionQueDivideANAux [x] _ = x
+imparConMayorPosicionQueDivideANAux (x:xs) n | (esImpar x) && (n `mod` x == 0) = x
+                                             | otherwise = imparConMayorPosicionQueDivideANAux xs n 
+
+
+
+imparConMayorPosicionQueDivideAN :: [Integer] -> Integer -> Integer
+imparConMayorPosicionQueDivideAN (x:xs) n = imparConMayorPosicionQueDivideANAux(invertir2 (x:xs) []) n 
