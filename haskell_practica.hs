@@ -1,8 +1,4 @@
-import GHC.Float (sinDouble)
-import Distribution.Simple.PackageIndex (InstalledPackageIndex)
-import Language.Haskell.TH (Strict)
-import Data.Complex (imagPart)
-import Graphics.Win32 (LARGE_INTEGER)
+
 
 contarMult3Hasta :: Integer -> Integer -> Integer
 contarMult3Hasta d h | h == 0 = 0
@@ -426,3 +422,191 @@ imparConMayorPosicionQueDivideANAux (x:xs) n | (esImpar x) && (n `mod` x == 0) =
 
 imparConMayorPosicionQueDivideAN :: [Integer] -> Integer -> Integer
 imparConMayorPosicionQueDivideAN (x:xs) n = imparConMayorPosicionQueDivideANAux(invertir2 (x:xs) []) n 
+
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+maximo :: [Integer] -> Integer
+maximo [x] = x
+maximo (x:y:xs) | x > y = maximo  (x:xs)
+                | otherwise = maximo (y:xs)
+
+
+
+
+obtenerFila :: [[Integer]] -> Integer -> [Integer] 
+obtenerFila (x:xs) i | i == 1 = x 
+                     | otherwise = obtenerFila xs (i-1)
+
+
+
+
+
+
+filaDelMaximoAux :: [[Integer]] -> Integer -> Integer 
+filaDelMaximoAux [x] i = i 
+filaDelMaximoAux (x:xs) i | maximo x > maximo(obtenerFila (xs)(maxDelResto)) = i 
+                          | otherwise = i + maxDelResto
+                          where maxDelResto = filaDelMaximoAux xs 1
+
+
+filaDelMaximo :: [[Integer]] -> Integer 
+filaDelMaximo (x:xs) = filaDelMaximoAux (x:xs) 1 
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+iesimoElemento :: [Integer] -> Integer -> Integer 
+iesimoElemento [x] _ = x
+iesimoElemento (x:xs) i | i == 1 = x 
+                        | otherwise = iesimoElemento xs (i-1)
+
+
+
+iesimaColumna :: [[Integer]] -> Integer -> [Integer]
+iesimaColumna [x] i = [iesimoElemento x i] 
+iesimaColumna (x:xs) i = iesimoElemento x i : iesimaColumna xs i 
+
+
+contarParesColumna :: [Integer] -> Integer
+contarParesColumna [] = 0 
+contarParesColumna (x:xs) | esPar x = 1 + contarParesColumna xs 
+                          | otherwise = contarParesColumna xs 
+
+
+
+
+
+cantidadParesColumna :: [[Integer]] -> Integer -> Integer
+cantidadParesColumna (x:xs) i = contarParesColumna(iesimaColumna (x:xs) i)
+
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+minimo :: [Integer] -> Integer
+minimo [x] = x 
+minimo (x:y:xs) | x > y = minimo (y:xs) 
+                | otherwise = minimo (x:xs)
+
+
+
+iesimaFila :: [[Integer]] -> Integer -> [Integer]
+iesimaFila (x:xs) i | i == 0 = x 
+                    | otherwise = iesimaFila xs (i-1)
+
+
+minimoDeFila :: [[Integer]] -> Integer -> Integer 
+minimoDeFila [x] _ = minimo x 
+minimoDeFila (x:xs) i = minimo(iesimaFila (x:xs) i)
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+maximaSumaDeTresConsecutivos :: [Integer] -> Integer
+maximaSumaDeTresConsecutivos [x,y,z] = x + y + z
+maximaSumaDeTresConsecutivos (x:y:z:xs) | x + y + z > sumaDelResto = x + y + z 
+                                        | otherwise = sumaDelResto
+                                        where sumaDelResto = maximaSumaDeTresConsecutivos (y:z:xs)
+
+
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+pertenece :: Char -> [Char] -> Bool
+pertenece _ [] = False 
+pertenece p (x:xs) | p == x = True
+                   | otherwise = pertenece p xs 
+
+
+
+quitarRepetidos :: [Char] -> [Char] 
+quitarRepetidos [] = []
+quitarRepetidos (x:xs) | pertenece x xs = quitarRepetidos xs 
+                       | otherwise = x : quitarRepetidos xs 
+
+
+
+compartidosAux :: [Char] -> [Char] -> [Char]
+compartidosAux [] _ = []
+compartidosAux (x:xs) p2 | x /= ' ' && pertenece x p2 = x : compartidosAux xs p2 
+                         | otherwise = compartidosAux xs p2 
+
+
+caracteresCompartidosSinEspacio :: [Char] -> [Char] -> [Char]
+caracteresCompartidosSinEspacio p1 p2 = compartidosAux (quitarRepetidos p1) p2 
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+diferenciaAux :: [Char] -> [Char] -> [Char]
+diferenciaAux [] _ = []
+diferenciaAux (x:xs) p2 | x /= ' ' && not (pertenece x p2) = x : diferenciaAux xs p2
+                        | otherwise  = diferenciaAux xs p2 
+
+
+
+diferenciaSinEspacios :: [Char] -> [Char] -> [Char]
+diferenciaSinEspacios p1 p2  = diferenciaAux(quitarRepetidos p1) p2  
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+filaCreciente :: [Integer] -> Bool
+filaCreciente [x] = True
+filaCreciente (x:y:xs) | x < y = filaCreciente (y:xs)
+                       | otherwise = False
+                    
+
+
+columnasCrecientes :: [[Integer]] -> Bool
+columnasCrecientes [x] = filaCreciente x 
+columnasCrecientes (fila:filas) | filaCreciente fila = columnasCrecientes filas 
+                                | otherwise = False 
+
+
+    
+
+
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+cuantosIgualesAux :: [Char] -> [Char] -> Integer 
+cuantosIgualesAux [] _ = 0 
+cuantosIgualesAux (x:xs) p | x /= ' ' && pertenece x p = 1 + cuantosIgualesAux xs p 
+                           | otherwise = cuantosIgualesAux xs p
+
+
+cuantosIguales :: [Char] -> [Char] -> Integer 
+cuantosIguales p1 p2 = cuantosIgualesAux(quitarRepetidos p1) p2 
+
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+filaAlternada :: [Integer] -> Bool
+filaAlternada [x] = True 
+filaAlternada (x:y:xs) | x * y < 0 = filaAlternada (y:xs)
+                       | otherwise = False 
+
+
+
+
+matrizAlternada :: [[Integer]] -> Bool
+matrizAlternada [x] = filaAlternada x 
+matrizAlternada (x:xs) | filaAlternada x = matrizAlternada xs 
+                       | otherwise = False 
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
